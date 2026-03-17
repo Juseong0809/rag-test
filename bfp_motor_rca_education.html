@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFP Motor 고장 원인 분석 - 전문 교육 자료</title>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --secondary: #2c5282;
+            --accent: #e53e3e;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --bg-light: #f7fafc;
+            --text-dark: #1a202c;
+            --text-light: #4a5568;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background: var(--bg-light);
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .meta-info {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .meta-item svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        nav ul {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            list-style: none;
+            overflow-x: auto;
+            padding: 0 1rem;
+        }
+
+        nav li {
+            flex-shrink: 0;
+        }
+
+        nav a {
+            display: block;
+            padding: 1rem 1.25rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        section h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        section h2::before {
+            content: '';
+            width: 4px;
+            height: 1.5rem;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        section h3 {
+            color: var(--secondary);
+            font-size: 1.15rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        /* Boxes */
+        .box {
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .box-info {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+        }
+
+        .box-warning {
+            background: #fffaf0;
+            border-left: 4px solid var(--warning);
+        }
+
+        .box-danger {
+            background: #fff5f5;
+            border-left: 4px solid var(--accent);
+        }
+
+        .box-success {
+            background: #f0fff4;
+            border-left: 4px solid var(--success);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            background: var(--secondary);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--border);
+        }
+
+        .timeline-item.active::before {
+            background: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .timeline-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Diagrams */
+        .diagram {
+            background: #fafbfc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .flow-chart {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .flow-step {
+            background: var(--secondary);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .flow-arrow {
+            color: var(--text-light);
+            font-size: 1.5rem;
+        }
+
+        /* Formulas */
+        .formula {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.95rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .formula-label {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Standards */
+        .standard-tag {
+            display: inline-block;
+            background: #e9d8fd;
+            color: #553c9a;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .standard-tag.matched {
+            background: #c6f6d5;
+            color: #276749;
+        }
+
+        /* Code/Technical */
+        code {
+            background: #edf2f7;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #c53030;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .card {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .card h4 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        footer p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.75rem; }
+            header { padding: 2rem 1rem; }
+            main { padding: 1rem; }
+            section { padding: 1.5rem; }
+            .meta-info { flex-direction: column; gap: 0.5rem; }
+            nav ul { padding: 0 0.5rem; }
+            nav a { padding: 0.75rem 1rem; font-size: 0.85rem; }
+        }
+
+        /* Print */
+        @media print {
+            nav { display: none; }
+            section { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>BFP Motor 고장 원인 분석</h1>
+            <p class="subtitle">Boiler Feed Pump Motor Failure Analysis - 전문 교육 자료</p>
+            <div class="meta-info">
+                <div class="meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    2026.02.19
+                </div>
+                <div class="meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Nghi Son 2, Vietnam
+                </div>
+                <div class="meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    11,000V / 14,600kW
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#overview" class="active">개요</a></li>
+            <li><a href="#incident">사고 경위</a></li>
+            <li><a href="#inspection">검사 결과</a></li>
+            <li><a href="#analysis">원인 분석</a></li>
+            <li><a href="#standards">국제규격</a></li>
+            <li><a href="#lessons">교육 포인트</a></li>
+            <li><a href="#improvement">개선 사항</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Executive Summary -->
+        <section id="overview">
+            <h2>개요 (Executive Summary)</h2>
+            
+            <div class="box box-warning">
+                <strong>사고 요약:</strong> 2025년 11월 2일, Nghi Son 2 발전소 Unit #2의 BFP(Boiler Feed Pump) 2B 모터가 최소 부하 267MW 운전 중 차동 보호(87) 작동으로 트립하였다.
+            </div>
+
+            <h3>장비 사양</h3>
+            <table>
+                <tr>
+                    <th>항목</th>
+                    <th>사양</th>
+                </tr>
+                <tr>
+                    <td>정격 용량</td>
+                    <td>14,600 kW</td>
+                </tr>
+                <tr>
+                    <td>정격 전압</td>
+                    <td>11,000 V (50Hz)</td>
+                </tr>
+                <tr>
+                    <td>극수</td>
+                    <td>4P</td>
+                </tr>
+                <tr>
+                    <td>정격 전류</td>
+                    <td>876 A</td>
+                </tr>
+                <tr>
+                    <td>모델</td>
+                    <td>10111700_0004</td>
+                </tr>
+            </table>
+
+            <div class="box box-info">
+                <h4 style="margin-top:0">📋 분석 대상</h4>
+                <ul style="margin-left:1.5rem">
+                    <li>총 5대 공급 (운전 중 4대, 고장 1대)</li>
+                    <li>고장 발생 후 약 3년 운전 기록 보유</li>
+                    <li>DOOSAN 제조, KEPRI/HYOSUNG 공동 검사</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Incident Timeline -->
+        <section id="incident">
+            <h2>사고 경위 (Incident Timeline)</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item active">
+                    <div class="timeline-date">2025. 11. 02</div>
+                    <p><strong>사고 발생:</strong> 267MW 최소 부하 운행 중 BFP-2B 모터 트립 (차동 보호 87 작동)</p>
+                    <ul style="margin-top:0.5rem; margin-left:1.5rem; font-size:0.9rem; color:var(--text-light)">
+                        <li>절연 저항(IR) 측정: 상간 및 상지 1MΩ 미만</li>
+                        <li>DE측 권선 단부의 blackening 및 탄화 확인</li>
+                        <li>Arc 자국, soot 침착, 절연 열화 확인</li>
+                    </ul>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025. 11. 05</div>
+                    <p>예비 모터로 교체</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026. 01. 23</div>
+                    <p>수리shop에 모터 도착</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026. 02. 02</div>
+                    <p><strong>공동 분해 검사:</strong> KEPRI, DOOSAN, HYOSUNG</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inspection Results -->
+        <section id="inspection">
+            <h2>검사 결과 (Inspection Results)</h2>
+
+            <h3>1. 시각 검사 (Visual Inspection)</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>✅ 양호</h4>
+                    <ul style="margin-left:1rem; font-size:0.9rem">
+                        <li>계자 권선 전체 상태 양호</li>
+                        <li>NDE (Non-Drive End) 권선 양호</li>
+                        <li>탄화粉尘 오염 없음</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>⚠️ 이상</h4>
+                    <ul style="margin-left:1rem; font-size:0.9rem">
+                        <li>DE (Drive End) 권선 탄화粉尘 오염</li>
+                        <li>12~3시 방향 특히 심함</li>
+                        <li>1번 상단 코일 하단부 고장 위치</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>2. 권선 단면 구조</h3>
+            <div class="diagram">
+                <div class="flow-chart">
+                    <div class="flow-step">슬롯 쐐기<br>(Slot Wedge)</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">상단 필러<br>(Top Filler)</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">상단 코일<br>(Top Coil)</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">주 절연<br>(Ground Wall)</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">중심 필러</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">하단 코일</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">하단 필러</div>
+                </div>
+                <p style="font-size:0.85rem; color:var(--text-light); margin-top:1rem">▶ 고장 지점: 상단 코일 (Turn-to-turn short 발생 위치)</p>
+            </div>
+
+            <div class="box box-danger">
+                <strong>핵심 발견:</strong>
+                <ul style="margin-left:1.5rem; margin-top:0.5rem">
+                    <li>1번 상단 코일 하단에서 턴단락(Turn-to-turn short) 발생</li>
+                    <li>코어 측면에서 전체 길이의 약 1/3 위치</li>
+                    <li>ECP (Endwinding Corona Protection) 하단면 접촉부</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Root Cause Analysis -->
+        <section id="analysis">
+            <h2>근본 원인 분석 (Root Cause Analysis)</h2>
+
+            <h3>고장 진행 메커니즘</h3>
+            
+            <div class="flow-chart" style="flex-direction:column; align-items:stretch">
+                <div class="flow-step" style="background:var(--accent)">1단계: 초기 결함 발생 (Turn-to-turn Short)</div>
+                <div class="flow-arrow" style="text-align:center">▼</div>
+                <div class="flow-step" style="background:var(--warning)">2단계: 손상 진행 (Surface Tracking Propagation)</div>
+                <div class="flow-arrow" style="text-align:center">▼</div>
+                <div class="flow-step" style="background:var(--primary)">3단계: 최종 고장 (Ground Fault & Melting)</div>
+            </div>
+
+            <h3>1단계: 턴단락 발생</h3>
+            <div class="box box-warning">
+                <p>상A 1번 상단 코일의 ECP 하단면에서 턴단락 발생 → 연막 및 탄화粉尘 생성 → 주변 탄소오염</p>
+                <p style="margin-top:0.5rem; font-size:0.9rem; color:var(--text-light)">위치: 상전압이 최초로 인가되는 incoming end의 첫 번째 코일</p>
+            </div>
+
+            <h3>2단계: 표면 트래킹 전파</h3>
+            <div class="box box-warning">
+                <p><strong>탄화된粉尘이 도전성 물질로 작용</strong>하여 표면 트래킹 발생:</p>
+                <ul style="margin-left:1.5rem; margin-top:0.5rem">
+                    <li>상A 모서리 → 엔드플레이트 상부</li>
+                    <li>상B 하단 코일 접촉면 → 엔드플레이트 하부</li>
+                </ul>
+            </div>
+
+            <h3>3단계: 지락 고장</h3>
+            <div class="box box-danger">
+                <p><strong>상A 모서리 트래킹 + 상B 하단 트래킹</strong> → 엔드플레이트와 지락 고장</p>
+                <p>급격한 전류 서지 → 동도체 용해 → 구리 외부 노출</p>
+            </div>
+
+            <h3>추정 원인</h3>
+            <div class="box box-info">
+                <ol style="margin-left:1.5rem">
+                    <li><strong>외부 서지 전압(Transient Overvoltage)</strong>에 의한 턴 절연 열화가 초기 원인</li>
+                    <li>외부 서지 발생 원인: <strong>낙뢰, 계통 이상, 차단기 개폐</strong></li>
+                    <li>제조 결함 가능성은 낮음 (3년 운전 후 고장 → 초기 운전 중 즉시 고장 아님)</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- International Standards -->
+        <section id="standards">
+            <h2>국제규격 적합성 검증</h2>
+
+            <div class="box box-success">
+                <h4 style="margin-top:0">📖 관련 국제규격</h4>
+            </div>
+
+            <table>
+                <tr>
+                    <th>규격</th>
+                    <th>적용 여부</th>
+                    <th>관련 내용</th>
+                </tr>
+                <tr>
+                    <td><span class="standard-tag matched">IEEE 1434</span></td>
+                    <td>✅ 적용</td>
+                    <td>Stator winding의 offline/online PD testing 기준</td>
+                </tr>
+                <tr>
+                    <td><span class="standard-tag matched">IEC 60034-27-1</span></td>
+                    <td>✅ 적용</td>
+                    <td>Offline PD testing for stator windings</td>
+                </tr>
+                <tr>
+                    <td><span class="standard-tag matched">IEC 60270</span></td>
+                    <td>✅ 적용</td>
+                    <td>Partial discharge theory and measurement</td>
+                </tr>
+                <tr>
+                    <td><span class="standard-tag">IEEE Press</span></td>
+                    <td>✅ 참조</td>
+                    <td>"Electrical Insulation for Rotating Machines" (표준 교재)</td>
+                </tr>
+                <tr>
+                    <td><span class="standard-tag">NEMA MG1</span></td>
+                    <td>✅ 참조</td>
+                    <td>Motors and Generators Standard</td>
+                </tr>
+            </table>
+
+            <div class="box box-info" style="margin-top:1.5rem">
+                <h4 style="margin-top:0">⚡ 서지 전압과 절연</h4>
+                <p>본 보고서에서 언급된 <strong>서지 전압(Surge Voltage)</strong>에 의한 절연 손상은 다음과 같은 국제 표준과 일치합니다:</p>
+                <ul style="margin-left:1.5rem; margin-top:0.5rem">
+                    <li>IEEE research: <strong>Steep front impulse voltages</strong>가 turn insulation 파괴의 주요 원인</li>
+                    <li>급격한 상승 시간의 서지는 multi-turn coil 구조에서 매우 위험</li>
+                    <li>첫 번째 코일(phase voltage initially applied)에서 턴 단락이 가장 빈번</li>
+                </ul>
+            </div>
+
+            <div class="formula">
+                <div class="formula-label">참고: 절연 내구성 안전계수</div>
+                k<sub>iz</sub> = U<sub>p</sub> / U<sub>N</sub>
+                <br><br>
+                여기서: U<sub>p</sub> = 절연 파괴 전압, U<sub>N</sub> = 정격 전압
+                <br>
+                신 규 절연의 경우 k<sub>iz</sub> > 5
+            </div>
+        </section>
+
+        <!-- Educational Points -->
+        <section id="lessons">
+            <h2>10년차 엔지니어를 위한 교육 포인트</h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h4>🔌 1. 고전압 모터 권선 이해</h4>
+                    <ul style="margin-left:1rem; font-size:0.9rem">
+                        <li>11kV급 권선은 다층 절연 시스템</li>
+                        <li>Turn Insulation + Main Insulation + Ground Wall</li>
+                        <li>ECP (Endwinding Corona Protection) 코팅 적용</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>⚡ 2. 서지 전압의 위험성</h4>
+                    <ul style="margin-left:1rem; font-size:0.9rem">
+                        <li>서지는 급격한 전압 상승 (단시간)</li>
+                        <li>주요 원인: 낙뢰, 계통 지락, Breaker 개폐</li>
+                        <li>첫 번째 코일이 가장 취약</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>📊 3. 절연 진단 방법</h4>
+                    <ul style="margin-left:1rem; font-size:0.9rem">
+                        <li>절연 저항 (IR) 측정</li>
+                        <li>Polarization Index (PI) 측정</li>
+                        <li>Tan Delta 테스트</li>
+                        <li>Partial Discharge (PD) 테스트</li>
+                        <li>서지 테스트 (Surge Test)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🔍 4. 고장 패턴 인식</h4>
+                    <ul style="margin-left:1rem; font-size:0.9rem">
+                        <li>Turn-to-turn short → Ground fault 진행</li>
+                        <li>탄화粉尘이 표면 트래킹 유발</li>
+                        <li>시간에 따른 손상 진행 메커니즘 이해</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="box box-warning" style="margin-top:1.5rem">
+                <h4 style="margin-top:0">⚠️ 제조 결함 vs 운전 중 결함</h4>
+                <table style="margin-top:0.5rem">
+                    <tr>
+                        <th>구분</th>
+                        <th>제조 결함</th>
+                        <th>운전 중 결함</th>
+                    </tr>
+                    <tr>
+                        <td>고장 시점</td>
+                        <td>초기 운전 중 (즉시)</td>
+                        <td>수년 운전 후</td>
+                    </tr>
+                    <tr>
+                        <td>주요 원인</td>
+                        <td>제조 과정 결함</td>
+                        <td>서지, 절연 열화, 환경</td>
+                    </tr>
+                    <tr>
+                        <td>예상 사례</td>
+                        <td>즉시 고장</td>
+                        <td>3년 후 (본 사례)</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Improvements -->
+        <section id="improvement">
+            <h2>개선 사항 (Improvements)</h2>
+
+            <h3>절연 시스템 강화 비교</h3>
+            <table>
+                <tr>
+                    <th>항목</th>
+                    <th>기존</th>
+                    <th>개선</th>
+                    <th>개선 효과</th>
+                </tr>
+                <tr>
+                    <td>절연 등급</td>
+                    <td>13.8kV Class F</td>
+                    <td>13.8kV Class F</td>
+                    <td>유지</td>
+                </tr>
+                <tr>
+                    <td>Strand 절연</td>
+                    <td>Dry Type (0.065mm)</td>
+                    <td>Semi-Dry Type (0.06mm)</td>
+                    <td>VPI 공정 시 수지 침투 개선, void 감소</td>
+                </tr>
+                <tr>
+                    <td>Mica Tape</td>
+                    <td>1/3 Overlap, 2 Turn</td>
+                    <td>1/3 Overlap, 2 Turn</td>
+                    <td>수지 함량 증가</td>
+                </tr>
+                <tr>
+                    <td>주 절연</td>
+                    <td>0.18mm, 1/2 Overlap</td>
+                    <td>0.135mm, 1/2 Overlap</td>
+                    <td>Glass chop 적용, 균일 수지 침투</td>
+                </tr>
+                <tr>
+                    <td>OCP</td>
+                    <td>0.085mm Vonroll</td>
+                    <td>0.09mm Vonroll (향상)</td>
+                    <td>내열 및 PD 특성 개선</td>
+                </tr>
+            </table>
+
+            <h3>추가 구조 개선</h3>
+            <div class="box box-success">
+                <ul style="margin-left:1.5rem">
+                    <li><strong>Glass Cord 추가 적용:</strong> 권선 끝 단부 기계적 지지 강성 증가</li>
+                    <li><strong>Delpormat 두께 증가:</strong> 슬롯 내 접촉 압력 강화</li>
+                    <li><strong>Air-dry varnish 도장:</strong> 쐐기 고정력 추가 보강</li>
+                </ul>
+            </div>
+
+            <h3>권고 조치</h3>
+            <div class="box box-info">
+                <ol style="margin-left:1.5rem">
+                    <li>운전 중인 4대에 대한 절연 진단 수행</li>
+                    <li>계통 서지 이벤트 기록 분석</li>
+                    <li>정기적인 Online PD 모니터링 도입 검토</li>
+                    <li>보호 협조(Protection Coordination) 재점검</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Conclusion -->
+        <section>
+            <h2>결론</h2>
+            
+            <div class="box box-success">
+                <h4 style="margin-top:0">📌 핵심 요약</h4>
+                <ol style="margin-left:1.5rem; margin-top:0.5rem">
+                    <li>설계/제조/시험 관점에서 본 사고와 관련된 이상은 확인되지 않음</li>
+                    <li>외부 서지 전압에 의한 턴 절연 열화가 초기 원인으로 추정</li>
+                    <li>탄화에 의한 표면 트래킹 전파가 지락 고장까지 진행</li>
+                    <li>3년 운전 후 고장 → 제조 결함보다 운전 요인이 더 유력</li>
+                </ol>
+            </div>
+
+            <div class="box box-warning" style="margin-top:1rem">
+                <h4 style="margin-top:0">🎯 교육적 교훈</h4>
+                <ul style="margin-left:1.5rem; margin-top:0.5rem">
+                    <li><strong>고전압 모터의 첫 번째 코일은 서지에 가장 취약</strong></li>
+                    <li><strong>Turn-to-turn short는 Ground fault로 진행</strong>될 수 있음</li>
+                    <li><strong>탄화粉尘은 도전성 경로</strong>를 형성하여 트래킹 가속화</li>
+                    <li><strong>정기적인 절연 진단</strong>으로 조기 이상 감지 필요</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>BFP Motor Root Cause Analysis - 교육 자료</p>
+        <p style="margin-top:0.5rem; opacity:0.6">Based on IEEE, IEC Standards | For Senior Engineers Training</p>
+    </footer>
+
+    <script>
+        // Smooth scroll and active nav
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if(target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Intersection Observer for active nav
+        const sections = document.querySelectorAll('section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    if(id) {
+                        document.querySelectorAll('nav a').forEach(a => {
+                            a.classList.remove('active');
+                            if(a.getAttribute('href') === '#' + id) {
+                                a.classList.add('active');
+                            }
+                        });
+                    }
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>
